@@ -5,9 +5,9 @@ public class ServiceHub : MonoBehaviour
     public static ServiceHub Instance { get; private set; }
 
     [Header("System References")]
-    [SerializeField] private FoodLogic foodLogic;
+    [SerializeField] private GameManager gameManager;
 
-    public FoodLogic FoodLogic => foodLogic;
+    public GameManager GameManager => gameManager;
 
     private void Awake()
     {
