@@ -390,6 +390,8 @@ MonoBehaviour:
   maxY: 4
   creaturePrefab: {fileID: 3288757216080918967, guid: f5eb51d782664dd41800bdc362c08bcc, type: 3}
   foodPrefab: {fileID: 6600920633197098614, guid: fe018c6b8bf82124fa7e15591506c060, type: 3}
+  startingCreatureCount: 5
+  startingFoodCount: 5
 --- !u!1 &1518097267
 GameObject:
   m_ObjectHideFlags: 0

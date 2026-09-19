@@ -54,8 +54,13 @@ public class CreatureLogic : MonoBehaviour
             }
             else
             {
-                //hunger -= 30;
                 // Implement reproduction logic here
+                int willReproduce = Random.Range(1, 101);
+                if(willReproduce <= reproductionChance)
+                {
+                    hunger -= 30;
+
+                }
             }
         }
     }

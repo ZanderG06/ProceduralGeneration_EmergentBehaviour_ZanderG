@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(PauseBeforeMethod());
     }
 
-    //Creatures are eating the before the system starts??? putting a pause in between to try and stop errors
+    //Pause at the start to allow food to spawn
     IEnumerator PauseBeforeMethod()
     {
         yield return new WaitForSeconds(1f);
