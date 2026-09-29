@@ -8,6 +8,8 @@ public class CreatureLogic : MonoBehaviour
     public float reachRadius;
     public int moveSpeed;
 
+    public Vector2[] corners;
+
     [SerializeField] private ServiceHub serviceHub;
     private Rigidbody2D rb;
 
@@ -25,6 +27,8 @@ public class CreatureLogic : MonoBehaviour
 
         gameObject.GetComponent<CircleCollider2D>().radius = reachRadius;
 
+        //Since it's a Prefab, I can't store the corner transforms as an easy public within the game scene
+        
         StartCoroutine(StartHungerSystem());
         StartCoroutine(SearchForFood());
     }
@@ -76,6 +80,17 @@ public class CreatureLogic : MonoBehaviour
         }
     }
 
+    IEnumerator GoTowardsCorner(Vector2 position)
+    {
+        while (isTouchingAnything)
+        {
+            yield return new WaitForSeconds(.1f);
+            rb.MovePosition(Vector2.MoveTowards(transform.position, position, moveSpeed * Time.deltaTime));
+
+            if (isTouchingAnything) break;
+        }
+    }
+
     private Transform FindClosestFood()
     {
         Transform closestTarget = null;
@@ -104,7 +119,8 @@ public class CreatureLogic : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Creature"))
         {
-            // Impliment run away logic here
+            Vector2 randomCorner = corners[Random.Range(0, corners.Length)];
+            StartCoroutine(GoTowardsCorner(randomCorner));
         }
     }
 
