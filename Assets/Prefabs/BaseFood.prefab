@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5114962224095764279}
   - component: {fileID: 7218843790997477147}
   - component: {fileID: 5974854831298867997}
+  - component: {fileID: 3296798974977736371}
   m_Layer: 0
   m_Name: BaseFood
   m_TagString: Food
@@ -122,9 +123,21 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &3296798974977736371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6600920633197098614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2c8254d2cde4148b372bd5c6d70fec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FoodLogic

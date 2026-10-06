@@ -1,18 +1,21 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public float minX;
-    public float maxX;
-    public float minY;
-    public float maxY;
+    [SerializeField] private float minX;
+    [SerializeField] private float maxX;
+    [SerializeField] private float minY;
+    [SerializeField] private float maxY;
 
-    public GameObject creaturePrefab;
-    public GameObject foodPrefab;
+    [SerializeField] private GameObject creaturePrefab;
+    [SerializeField] private GameObject foodPrefab;
 
-    public int startingCreatureCount;
-    public int startingFoodCount;
+    [SerializeField] private int startingCreatureCount;
+    [SerializeField] private int maxFoodCount;
+
+    public int currentFoodCount;
 
     private void Start()
     {
@@ -32,9 +35,9 @@ public class GameManager : MonoBehaviour
         StartFoodLoop();
     }
 
-    private void StartFoodLoop()
+    public void StartFoodLoop()
     {
-        for (int i = 0; i < startingFoodCount; i++)
+        for (int i = currentFoodCount; i < maxFoodCount; i++)
         {
             InstantiateFood();
         }
@@ -48,11 +51,15 @@ public class GameManager : MonoBehaviour
         Instantiate(creaturePrefab, new Vector3(randomX, randomY, 0), Quaternion.identity);
     }
 
-    public void InstantiateFood()
+    private void InstantiateFood()
     {
+        if (currentFoodCount >= maxFoodCount) return;
+
         float randomX = Random.Range(minX, maxX);
         float randomY = Random.Range(minY, maxY);
 
         Instantiate(foodPrefab, new Vector3(randomX, randomY, 0), Quaternion.identity);
+
+        currentFoodCount++;
     }
 }

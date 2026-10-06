@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class CreatureLogic : MonoBehaviour
 {
-    public int hunger;
-    public int reproductionChance;
-    public float reachRadius;
-    public int moveSpeed;
-
-    public Vector2[] corners;
+    [SerializeField] private int hunger;
+    [SerializeField] private int reproductionChance;
+    [SerializeField] private int moveSpeed;
+    [SerializeField] private Vector2[] corners;
+    [SerializeField] private CircleCollider2D grabRadius;
+    [SerializeField] private CircleCollider2D shyRadius;
 
     [SerializeField] private ServiceHub serviceHub;
     private Rigidbody2D rb;
@@ -22,12 +22,10 @@ public class CreatureLogic : MonoBehaviour
 
         hunger = Random.Range(10, 101);
         reproductionChance = Random.Range(1, 101);
-        reachRadius = Random.Range(.5f, 3f);
         moveSpeed = Random.Range(10, 31);
 
-        gameObject.GetComponent<CircleCollider2D>().radius = reachRadius;
-
-        //Since it's a Prefab, I can't store the corner transforms as an easy public within the game scene
+        shyRadius.radius = Random.Range(.5f, 3f);
+        grabRadius.radius = Random.Range(1f, 1.5f);
         
         StartCoroutine(StartHungerSystem());
         StartCoroutine(SearchForFood());
@@ -60,10 +58,9 @@ public class CreatureLogic : MonoBehaviour
             {
                 // Implement reproduction logic here
                 int willReproduce = Random.Range(1, 101);
-                if(willReproduce <= reproductionChance)
+                if (willReproduce <= reproductionChance)
                 {
-                    hunger -= 30;
-
+                    hunger -= 10;
                 }
             }
         }
@@ -87,7 +84,7 @@ public class CreatureLogic : MonoBehaviour
             yield return new WaitForSeconds(.1f);
             rb.MovePosition(Vector2.MoveTowards(transform.position, position, moveSpeed * Time.deltaTime));
 
-            if (isTouchingAnything) break;
+            if (!isTouchingAnything) break;
         }
     }
 
@@ -111,16 +108,20 @@ public class CreatureLogic : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         isTouchingAnything = true;
-        if (collision.gameObject.CompareTag("Food"))
-        {
-            hunger += 30;
-            Destroy(collision.gameObject);
-            serviceHub.GameManager.InstantiateFood();
-        }
         if (collision.gameObject.CompareTag("Creature"))
         {
             Vector2 randomCorner = corners[Random.Range(0, corners.Length)];
             StartCoroutine(GoTowardsCorner(randomCorner));
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Food"))
+        {
+            hunger += 30;
+            Destroy(collision.gameObject);
+            serviceHub.GameManager.StartFoodLoop();
         }
     }
 
