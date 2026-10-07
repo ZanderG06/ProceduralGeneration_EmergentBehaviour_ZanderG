@@ -4,11 +4,11 @@ using UnityEngine;
 public class CreatureLogic : MonoBehaviour
 {
     [SerializeField] private int hunger;
+    [SerializeField] private int saturation;
     [SerializeField] private int reproductionChance;
     [SerializeField] private int moveSpeed;
     [SerializeField] private Vector2[] corners;
     [SerializeField] private CircleCollider2D grabRadius;
-    [SerializeField] private CircleCollider2D shyRadius;
 
     [SerializeField] private ServiceHub serviceHub;
     private Rigidbody2D rb;
@@ -20,13 +20,15 @@ public class CreatureLogic : MonoBehaviour
         serviceHub = ServiceHub.Instance;
         rb = GetComponent<Rigidbody2D>();
 
-        hunger = Random.Range(10, 101);
-        reproductionChance = Random.Range(1, 101);
-        moveSpeed = Random.Range(10, 31);
-
-        shyRadius.radius = Random.Range(.5f, 3f);
+        hunger = 30;
+        saturation = Random.Range(10, 31);
+        reproductionChance = Random.Range(1, 26);
+        moveSpeed = Random.Range(15, 36);
         grabRadius.radius = Random.Range(1f, 1.5f);
-        
+
+        serviceHub.GameManager.totalCreatureCount++;
+        name = $"Creature {serviceHub.GameManager.totalCreatureCount}"; //Inspector only, just to keep it tidy
+
         StartCoroutine(StartHungerSystem());
         StartCoroutine(SearchForFood());
     }
@@ -50,17 +52,24 @@ public class CreatureLogic : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(.5f);
-            if (hunger < 50)
-            {
-                StartCoroutine(GoTowardsFood());
-            }
+
+            if (hunger < 60) StartCoroutine(GoTowardsFood());
             else
             {
+                StartCoroutine(GoTowardsCorner(corners[Random.Range(0, corners.Length)]));
+
                 // Implement reproduction logic here
                 int willReproduce = Random.Range(1, 101);
                 if (willReproduce <= reproductionChance)
                 {
-                    hunger -= 10;
+                    Debug.Log($"{name} reproduce with {hunger} hunger ({willReproduce}/{reproductionChance} chance)");
+                    hunger /= 4;
+                    GameObject clone = Instantiate(gameObject, Random.insideUnitCircle * 2f + (Vector2)transform.position, Quaternion.identity);
+                    clone.GetComponent<CreatureLogic>().hunger = 30;
+                    clone.GetComponent<CreatureLogic>().saturation = saturation + Random.Range(-10, 11);
+                    clone.GetComponent<CreatureLogic>().reproductionChance = reproductionChance - Random.Range(-20, 11);
+                    clone.GetComponent<CreatureLogic>().moveSpeed = moveSpeed + Random.Range(-5, 6);
+                    clone.GetComponent<CreatureLogic>().grabRadius.radius = grabRadius.radius + Random.Range(-.2f, .3f);
                 }
             }
         }
@@ -74,17 +83,22 @@ public class CreatureLogic : MonoBehaviour
             rb.MovePosition(Vector2.MoveTowards(transform.position, FindClosestFood().position, moveSpeed * Time.deltaTime));
 
             if (hunger > 50) break;
+            if (isTouchingAnything)
+            {
+                StartCoroutine(GoTowardsCorner(corners[Random.Range(0, corners.Length)]));
+                break;
+            }
         }
     }
 
     IEnumerator GoTowardsCorner(Vector2 position)
     {
-        while (isTouchingAnything)
+        while (hunger > 60)
         {
             yield return new WaitForSeconds(.1f);
             rb.MovePosition(Vector2.MoveTowards(transform.position, position, moveSpeed * Time.deltaTime));
 
-            if (!isTouchingAnything) break;
+            if (hunger < 60) break;
         }
     }
 
@@ -92,7 +106,7 @@ public class CreatureLogic : MonoBehaviour
     {
         Transform closestTarget = null;
         float closestDistance = Mathf.Infinity; //Mathf.Infinity is a positive Infinity, which is useful for the first loop of the foreach statement to save the shortest distance
-        foreach(GameObject target in GameObject.FindGameObjectsWithTag("Food")) //I'll admit this might be unoptimized, I will look into better functions since there will be lots of creatures
+        foreach(GameObject target in GameObject.FindGameObjectsWithTag("Food")) 
         {
             float distance = Vector3.Distance(target.transform.position, transform.position);
             if (distance < closestDistance) //After 5 loops, this should save the closest position
@@ -104,24 +118,16 @@ public class CreatureLogic : MonoBehaviour
 
         return closestTarget;
     }
-
+    
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        isTouchingAnything = true;
-        if (collision.gameObject.CompareTag("Creature"))
-        {
-            Vector2 randomCorner = corners[Random.Range(0, corners.Length)];
-            StartCoroutine(GoTowardsCorner(randomCorner));
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
+        //isTouchingAnything = true;
         if (collision.gameObject.CompareTag("Food"))
         {
-            hunger += 30;
+            hunger += saturation - Random.Range(1, 11);
+            if(hunger > 100) hunger = 100;
             Destroy(collision.gameObject);
-            serviceHub.GameManager.StartFoodLoop();
+            serviceHub.GameManager.PreventFoodScarcity();
         }
     }
 

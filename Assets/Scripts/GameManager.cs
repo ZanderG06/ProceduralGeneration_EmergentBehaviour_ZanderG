@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -13,9 +12,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject foodPrefab;
 
     [SerializeField] private int startingCreatureCount;
-    [SerializeField] private int maxFoodCount;
+    [SerializeField] private int minFoodCount;
 
     public int currentFoodCount;
+    public int totalCreatureCount;
 
     private void Start()
     {
@@ -37,7 +37,15 @@ public class GameManager : MonoBehaviour
 
     public void StartFoodLoop()
     {
-        for (int i = currentFoodCount; i < maxFoodCount; i++)
+        for (int i = currentFoodCount; i < minFoodCount; i++)
+        {
+            InstantiateFood();
+        }
+    }
+
+    public void PreventFoodScarcity()
+    {
+        if(currentFoodCount < 3)
         {
             InstantiateFood();
         }
@@ -53,7 +61,7 @@ public class GameManager : MonoBehaviour
 
     private void InstantiateFood()
     {
-        if (currentFoodCount >= maxFoodCount) return;
+        if (currentFoodCount >= minFoodCount) return;
 
         float randomX = Random.Range(minX, maxX);
         float randomY = Random.Range(minY, maxY);
