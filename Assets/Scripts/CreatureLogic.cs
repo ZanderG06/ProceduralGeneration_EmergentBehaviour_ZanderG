@@ -26,6 +26,7 @@ public class CreatureLogic : MonoBehaviour
         moveSpeed = Random.Range(15, 36);
         grabRadius.radius = Random.Range(1f, 1.5f);
 
+        serviceHub.GameManager.currentCreatureCount++;
         serviceHub.GameManager.totalCreatureCount++;
         name = $"Creature {serviceHub.GameManager.totalCreatureCount}"; //Inspector only, just to keep it tidy
 
@@ -42,6 +43,7 @@ public class CreatureLogic : MonoBehaviour
             if (hunger <= 0)
             {
                 Destroy(gameObject);
+                serviceHub.GameManager.currentCreatureCount--;
             }
         }
     }
@@ -62,9 +64,9 @@ public class CreatureLogic : MonoBehaviour
                 // Implement reproduction logic here
                 yield return new WaitForSeconds(3f);
                 int willReproduce = Random.Range(1, 101);
-                if (willReproduce <= reproductionChance)
+                if (willReproduce <= reproductionChance && serviceHub.GameManager.currentCreatureCount < serviceHub.GameManager.maxCreatureCount)
                 {
-                    Debug.Log($"{name} reproduce with {hunger} hunger ({willReproduce}/{reproductionChance} chance)");
+                    Debug.Log($"{name} reproduced with {hunger} hunger ({reproductionChance}% chance)");
                     hunger /= 4;
                     GameObject clone = Instantiate(gameObject, Random.insideUnitCircle * 2f + (Vector2)transform.position, Quaternion.identity);
                     clone.GetComponent<CreatureLogic>().hunger = 30;

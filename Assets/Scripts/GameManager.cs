@@ -3,19 +3,23 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("World Bounds")]
     [SerializeField] private float minX;
     [SerializeField] private float maxX;
     [SerializeField] private float minY;
     [SerializeField] private float maxY;
 
+    [Header("Prefabs")]
     [SerializeField] private GameObject creaturePrefab;
     [SerializeField] private GameObject foodPrefab;
 
+    [Header("Counts")]
     [SerializeField] private int startingCreatureCount;
-    [SerializeField] private int minFoodCount;
-
+    [SerializeField] private int startingFoodCount;
     public int currentFoodCount;
+    public int currentCreatureCount;
     public int totalCreatureCount;
+    public int maxCreatureCount;
 
     private void Start()
     {
@@ -37,7 +41,7 @@ public class GameManager : MonoBehaviour
 
     public void StartFoodLoop()
     {
-        for (int i = currentFoodCount; i < minFoodCount; i++)
+        for (int i = currentFoodCount; i < startingFoodCount; i++)
         {
             InstantiateFood();
         }
@@ -61,7 +65,7 @@ public class GameManager : MonoBehaviour
 
     private void InstantiateFood()
     {
-        if (currentFoodCount >= minFoodCount) return;
+        if (currentFoodCount >= startingFoodCount) return;
 
         float randomX = Random.Range(minX, maxX);
         float randomY = Random.Range(minY, maxY);
