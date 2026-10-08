@@ -56,9 +56,11 @@ public class CreatureLogic : MonoBehaviour
             if (hunger < 60) StartCoroutine(GoTowardsFood());
             else
             {
-                StartCoroutine(GoTowardsCorner(corners[Random.Range(0, corners.Length)]));
+                //StartCoroutine(GoTowardsCorner(corners[Random.Range(0, corners.Length)]));
+                StartCoroutine(GoTowardsFood());
 
                 // Implement reproduction logic here
+                yield return new WaitForSeconds(3f);
                 int willReproduce = Random.Range(1, 101);
                 if (willReproduce <= reproductionChance)
                 {
@@ -82,12 +84,13 @@ public class CreatureLogic : MonoBehaviour
             yield return new WaitForSeconds(.1f);
             rb.MovePosition(Vector2.MoveTowards(transform.position, FindClosestFood().position, moveSpeed * Time.deltaTime));
 
+            /*
             if (hunger > 50) break;
             if (isTouchingAnything)
             {
                 StartCoroutine(GoTowardsCorner(corners[Random.Range(0, corners.Length)]));
                 break;
-            }
+            }*/
         }
     }
 
@@ -109,7 +112,7 @@ public class CreatureLogic : MonoBehaviour
         foreach(GameObject target in GameObject.FindGameObjectsWithTag("Food")) 
         {
             float distance = Vector3.Distance(target.transform.position, transform.position);
-            if (distance < closestDistance) //After 5 loops, this should save the closest position
+            if (distance < closestDistance)
             {
                 closestDistance = distance;
                 closestTarget = target.transform;
